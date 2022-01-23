@@ -4,6 +4,26 @@ using UnityEngine;
 
 public class UIBehaviour : MonoBehaviour
 {
+    private static UIBehaviour instance;
+
+    public static UIBehaviour Instance
+    {
+        get
+        {
+            if (instance) return instance;
+            return null;
+        }
+    }
+
+
+
+    protected virtual void Awake()
+    {
+        Debug.Log("ƒVƒ“ƒOƒ‹ƒgƒ“ > " + this.transform.name);
+        instance = this;
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
