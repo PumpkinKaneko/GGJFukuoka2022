@@ -11,6 +11,8 @@ public class UIBehaviour : MonoBehaviour
         get
         {
             if (instance) return instance;
+
+            Debug.LogError("UIGroup‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB");
             return null;
         }
     }
