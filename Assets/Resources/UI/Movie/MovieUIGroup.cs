@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Video;
 
 
-public class MovieUIGroup : UIBehaviour
+public class MovieUIGroup : UIBehaviour<MovieUIGroup>
 {
     [SerializeField]private VideoClip[] movies;          // 再生する動画ファイル
     [SerializeField]private VideoPlayer targetPlayer;    // 対象のVideoPlayerコンポーネント
@@ -14,7 +14,7 @@ public class MovieUIGroup : UIBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // this.PlayMovie(TeamState.Takenoko);     // 指定した動画を再生する
+        //UIManager.PlayTeamMovie(TeamState.Kinoko);     // 指定した動画を再生する
     }
 
     // Update is called once per frame
@@ -28,7 +28,7 @@ public class MovieUIGroup : UIBehaviour
     /// 動画再生メソッド
     /// </summary>
     /// <param name="team">チームの状態</param>
-    public void PlayMovie(TeamState team)
+    public override void PlayMovie(TeamState team)
     {
         switch(team)
         {
@@ -46,6 +46,8 @@ public class MovieUIGroup : UIBehaviour
                 //Debug.Log("タケノコを再生します。");
                 break;
         }
+
+        base.PlayMovie(team);
     }
 }
 

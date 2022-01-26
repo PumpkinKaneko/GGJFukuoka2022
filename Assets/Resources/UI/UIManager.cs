@@ -1,11 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class UIManager
 {
-    public static float Energy { get; set; }        // エネルギー値   
-    public static float Timer { get; set; }         // 時間
-    public static float MaxTime { get; set; }       // 最大時間
-    public static float Melt { get; set; }          // 溶け値
+    public static void PlayGameTimer(float time)
+    {
+        IngameUIGroup instance = IngameUIGroup.Instance;
+        if(instance)
+        {
+            instance.PlayTimer(time);
+        }
+        else
+        {
+            Debug.LogWarning("インスタンス[" + typeof(IngameUIGroup) + "]が見つかりません。\nシーン[ " + SceneManager.GetActiveScene().name + " ]に対象のインスタンスが存在するか確認してください。");
+        }
+    }
+
+
+    public static void PlayTeamMovie(TeamState team)
+    {
+        MovieUIGroup instance = MovieUIGroup.Instance;
+        if(instance)
+        {
+            instance.PlayMovie(team);
+        }
+        else
+        {
+            Debug.LogWarning("インスタンス[" + typeof(MovieUIGroup) + "]が見つかりません。\nシーン[ " + SceneManager.GetActiveScene().name + " ]に対象のインスタンスが存在するか確認してください。");
+        }
+    }
 }

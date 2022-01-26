@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIBehaviour : MonoBehaviour
+public class UIBehaviour<T> : MonoBehaviour where T : UIBehaviour<T>
 {
-    private static UIBehaviour instance;
+    private static T instance;
 
-    public static UIBehaviour Instance
+    public static T Instance
     {
         get
         {
@@ -22,7 +22,7 @@ public class UIBehaviour : MonoBehaviour
     protected virtual void Awake()
     {
         Debug.Log("シングルトン > " + this.transform.name);
-        instance = this;
+        instance = (T)this;
     }
 
 
@@ -37,4 +37,11 @@ public class UIBehaviour : MonoBehaviour
     {
         
     }
+
+
+    /// <summary>
+    /// 動画再生メソッド
+    /// </summary>
+    /// <param name="team">チームの状態</param>
+    public virtual void PlayMovie(TeamState team) { }
 }
