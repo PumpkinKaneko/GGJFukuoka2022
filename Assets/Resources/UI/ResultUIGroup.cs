@@ -8,14 +8,16 @@ public class ResultUIGroup : UIBehaviour<ResultUIGroup>
     [SerializeField] private BowlUIGage[] bowlGage;
     [SerializeField] private Image winnerImage;
     [SerializeField] private Sprite[] winnerSprite;
+    [SerializeField] private GameObject[] characterArray;
 
     private int winner;
+    private int loser;
 
 
     // Start is called before the first frame update
     void Start()
     {
-        SetWinner(TeamState.Kinoko);
+        //UIManager.SetWinner(TeamState.Kinoko);
     }
 
     // Update is called once per frame
@@ -28,6 +30,17 @@ public class ResultUIGroup : UIBehaviour<ResultUIGroup>
     public void SetWinner(TeamState team)
     {
         winner = (int)team;
+
+        switch(winner)
+        {
+            case (int)TeamState.Kinoko:
+                loser = (int)TeamState.Takenoko;
+                break;
+
+            case (int)TeamState.Takenoko:
+                loser = (int)TeamState.Kinoko;
+                break;
+        }
 
         bowlGage[winner].SetWinner();
 
@@ -48,4 +61,14 @@ public class ResultUIGroup : UIBehaviour<ResultUIGroup>
                 break;
         }
     }
+
+
+    public void NockOut()
+    {
+        Debug.Log("Nock Out");
+
+        characterArray[loser].GetComponent<Rigidbody>().AddForce(Vector3.forward * -50, ForceMode.Impulse);
+        Destroy(characterArray[loser], 2f);
+    }
+
 }
