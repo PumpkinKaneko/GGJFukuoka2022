@@ -12,7 +12,7 @@ public class UIBehaviour<T> : MonoBehaviour where T : UIBehaviour<T>
         {
             if (instance) return instance;
 
-            Debug.LogError("UIGroup‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñB");
+            Debug.LogError("UIGroupï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½B");
             return null;
         }
     }
@@ -21,7 +21,7 @@ public class UIBehaviour<T> : MonoBehaviour where T : UIBehaviour<T>
 
     protected virtual void Awake()
     {
-        Debug.Log("ƒVƒ“ƒOƒ‹ƒgƒ“ > " + this.transform.name);
+        Debug.Log("ï¿½Vï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½gï¿½ï¿½ > " + this.transform.name);
         instance = (T)this;
     }
 
@@ -40,8 +40,8 @@ public class UIBehaviour<T> : MonoBehaviour where T : UIBehaviour<T>
 
 
     /// <summary>
-    /// “®‰æÄ¶ƒƒ\ƒbƒh
+    /// ï¿½ï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½\ï¿½bï¿½h
     /// </summary>
-    /// <param name="team">ƒ`[ƒ€‚Ìó‘Ô</param>
+    /// <param name="team">ï¿½`ï¿½[ï¿½ï¿½ï¿½Ìï¿½ï¿½</param>
     public virtual void PlayMovie(TeamState team) { }
 }
