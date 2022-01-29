@@ -630,7 +630,7 @@ PrefabInstance:
     - target: {fileID: 1973750641757597459, guid: e76b8f0fd4bd12f4c80eb836e4c9117c, type: 3}
       propertyPath: movies.Array.data[1]
       value: 
-      objectReference: {fileID: 32900000, guid: b6a660980d6c3e242979466612b9cd03, type: 3}
+      objectReference: {fileID: 32900000, guid: 943a75dff1e8e4f4281e1b010c3ab2c6, type: 3}
     - target: {fileID: 1973750641757597460, guid: e76b8f0fd4bd12f4c80eb836e4c9117c, type: 3}
       propertyPath: m_Name
       value: MovieUIGroup

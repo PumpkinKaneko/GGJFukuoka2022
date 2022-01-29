@@ -31,4 +31,18 @@ public class UIManager
             Debug.LogWarning("インスタンス[" + typeof(MovieUIGroup) + "]が見つかりません。\nシーン[ " + SceneManager.GetActiveScene().name + " ]に対象のインスタンスが存在するか確認してください。");
         }
     }
+
+
+    public static void SetWinner(TeamState team)
+    {
+        ResultUIGroup instance = ResultUIGroup.Instance;
+        if (instance)
+        {
+            instance.SetWinner(team);
+        }
+        else
+        {
+            Debug.LogWarning("インスタンス[" + typeof(ResultUIGroup) + "]が見つかりません。\nシーン[ " + SceneManager.GetActiveScene().name + " ]に対象のインスタンスが存在するか確認してください。");
+        }
+    }
 }
