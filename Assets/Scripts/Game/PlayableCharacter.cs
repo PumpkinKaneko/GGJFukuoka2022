@@ -1,7 +1,9 @@
 using System;
+using System.Resources;
 using ExitGames.Client.Photon;
 using Photon.Pun;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayableCharacter : MonoBehaviourPunCallbacks
@@ -37,6 +39,18 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
     // 焼かれて死んでしまうまでの時間
     [SerializeField]
     public float burnedDeadTime = 10f;
+
+    [SerializeField]
+    private GameObject playerCanvas;
+
+    [SerializeField]
+    private Slider uiHPSlider;
+
+    [SerializeField]
+    private Slider enemyHPSlider;
+
+    [SerializeField]
+    private TimerUI timer;
     
     // 焼かれてる経過時間
     public float burnedTime = 0f;
@@ -48,10 +62,12 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
     private CharacterController characterController;
 
     private bool isInit = false;
-    
+
     // 初期化処理
     public void Init()
     {
+        uiHPSlider.value = Mathf.InverseLerp(0f, burnedDeadTime, 1f);
+        enemyHPSlider.value = Mathf.InverseLerp(0f, burnedDeadTime,1f);
         burningObject.Init();
         burnedTime = 0f;
     }
@@ -67,6 +83,20 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
     {
         transform.position = pos;
     }
+
+    public void GameStart()
+    {
+        photonView.RPC(nameof(GameStartRPC),RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void GameStartRPC()
+    {
+        if (photonView.IsMine)
+        {
+            playerCamera.gameObject.SetActive(true);
+        }
+    }
     
     void Start()
     {
@@ -75,7 +105,7 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
 
     void Update()
     {
-        if (PhotonNetwork.IsConnected)
+        if (PhotonNetwork.IsConnected && photonView.Controller != null)
         {
             if (!isInit)
             {
@@ -84,6 +114,7 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
                 // このオブジェクトがローカルのものか
                 if (photonView.IsMine)
                 {
+                    playerCanvas.SetActive(true);
                     isLocal = true;
                     playerCamera.enabled = true;            
                     GameStageManager.Instance.SetCharacter(this,true);
@@ -91,6 +122,7 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
                 }
                 else
                 {
+                    playerCanvas.SetActive(false);
                     isLocal = false;
                     playerCamera.enabled = false;
                     GameStageManager.Instance.SetCharacter(this,false);
@@ -98,6 +130,7 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
                     // characterController.isStop = true;
                 }
 
+                SwitchAttack(false);
                 // UpdateHashTable();
             }
         }
@@ -112,6 +145,7 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
             }
         }
         
+        
         UpdateBurning();
         UpdateHashTable();
     }
@@ -119,6 +153,8 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
     // 焼かれてる時の処理
     void UpdateBurning()
     {
+        uiHPSlider.value = 1f - Mathf.InverseLerp(0f, burnedDeadTime, burnedTime);
+        enemyHPSlider.value = 1f - Mathf.InverseLerp(0f, burnedDeadTime,burnedTime);
         if (IsBurning && !isBurned)
         {
             if (burnedTime >= burnedDeadTime)
@@ -185,6 +221,22 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
     public void OnConnectedToServer()
     {
 
+    }
+
+    public void UpdateTimer(float progress)
+    {
+        photonView.RPC(nameof(UpdateTimerRPC),RpcTarget.All,progress);
+    }
+
+    [PunRPC]
+    public void UpdateTimerRPC(float progress)
+    {
+        timer.TimerUpdate(progress,1f);
+    }
+
+    public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
+    {
+        
     }
 
     public override void OnJoinedRoom()

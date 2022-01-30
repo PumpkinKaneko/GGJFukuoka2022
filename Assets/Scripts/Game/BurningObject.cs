@@ -7,9 +7,27 @@ public class BurningObject : MonoBehaviour
     [SerializeField]
     public string targetTag = "BurningLight";
 
+    private float elapsedTime = 0f;
+    
+    private bool isTriggerStay = false;
+    
     public void Init()
     {
         isBurning = false;
+    }
+
+    void Update()
+    {
+        if (isTriggerStay)
+        {
+            if (elapsedTime >= 0.3f)
+            {
+                isTriggerStay = false;
+                isBurning = false;
+                elapsedTime = 0f;
+            }
+            elapsedTime += Time.deltaTime;
+        }
     }
     
     public void OnTriggerEnter(Collider other)
@@ -25,6 +43,8 @@ public class BurningObject : MonoBehaviour
         if (other.gameObject.tag == targetTag)
         {
             isBurning = true;
+            isTriggerStay = true;
+            elapsedTime = 0f;
         }
     }
 

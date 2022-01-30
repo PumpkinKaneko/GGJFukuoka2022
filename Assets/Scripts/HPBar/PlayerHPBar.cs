@@ -22,7 +22,7 @@ public class PlayerHPBar : MonoBehaviour
     }
 
     // ColliderオブジェクトのIsTriggerにチェックを入れること
-    private void OntriggerEnter(Collider collider)
+    private void OnTriggerEnter(Collider collider)
     {
         // Enemyタグのオブジェクトに触れると発動
         if (collider.gameObject.tag == "Enemy")

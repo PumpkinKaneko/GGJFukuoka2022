@@ -50,6 +50,8 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
 
     private GameStageState curState = GameStageState.READY;
 
+    private float switchAttackTimerProgress = 0f;
+    
     public string curStateStr = GameStageState.READY.ToString();
     
     private float serverStartTime = 0f;
@@ -73,10 +75,14 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
     public bool isGamePlaying = false;
 
     private bool isSwitchAttack = false;
+
+    private float switchProgress = 0f;
     
     // 初期化処理
     public void Init()
     {
+        switchProgress = 0f;
+        switchAttackTimerProgress = 0f;
         serverStartTime = PhotonNetwork.ServerTimestamp;
         thirdPersonCamera.gameObject.SetActive(false);
         isGamePlaying = false;
@@ -179,9 +185,15 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         {
             characterInfos.Add(targetPlayer.UserId,new CharacterCustomInfo());
         }
-        characterInfos[targetPlayer.UserId] = CharacterCustomInfo.HashTableToCharacterInfo(changedProps);
-        characterInfos[targetPlayer.UserId].userId = targetPlayer.UserId;
 
+        try
+        {
+            characterInfos[targetPlayer.UserId] = CharacterCustomInfo.HashTableToCharacterInfo(changedProps);
+            characterInfos[targetPlayer.UserId].userId = targetPlayer.UserId;
+        }
+        catch
+        { }
+   
         if (networkCharacters.ContainsKey(targetPlayer.UserId))
         {
             networkCharacters[targetPlayer.UserId].SetcustomInfo(characterInfos[targetPlayer.UserId]);
@@ -198,7 +210,7 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         roomHash["aliveTakenokoCount"] = aliveTakenokoCount;
         roomHash["stageSize"] = stageSize;
         roomHash["stageState"] = curState.ToString();
-
+        roomHash["switchAttackTimerProgress"] = switchAttackTimerProgress;
         Room room = PhotonNetwork.CurrentRoom;
         room.SetCustomProperties(roomHash);
 
@@ -233,6 +245,7 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
                 foreach (var key in networkCharacters.Keys)
                 {
                     bool isAttack = networkCharacters[key].team == attackTeam;
+                    networkCharacters[key].GameStart();
                     networkCharacters[key].SwitchAttack(isAttack);
                 }
                 break;
@@ -279,6 +292,25 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
                 ChangeState(GameStageState.GAME);
                 break;
             case GameStageState.GAME:
+                switchProgress += Time.deltaTime;
+                switchAttackTimerProgress = Mathf.InverseLerp(0f,switchAttackInterval,switchProgress);
+                if (switchProgress >= switchAttackInterval)
+                {
+                    switchProgress -= switchAttackInterval;
+                    foreach (var key in networkCharacters.Keys)
+                    {
+                        bool isAttack = networkCharacters[key].isAttack;
+                        networkCharacters[key].SwitchAttack(!isAttack);
+                    }
+                }
+                
+                // タイマー更新
+                foreach (var key in networkCharacters.Keys)
+                {
+                    networkCharacters[key].UpdateTimer(switchAttackTimerProgress);
+                }
+                
+                /*
                 if ((int) elapsedTime % (int) switchAttackInterval == 0 && !isSwitchAttack)
                 {
                     foreach (var key in networkCharacters.Keys)
@@ -286,13 +318,18 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
                         bool isAttack = networkCharacters[key].isAttack;
                         networkCharacters[key].SwitchAttack(!isAttack);
                     }
-
+                    // switchAttackTimerProgress = 1f;
                     isSwitchAttack = true;
                 }
                 else
                 {
-                   if((int) elapsedTime % (int) switchAttackInterval != 0) isSwitchAttack = false;
+                    if ((int) elapsedTime % (int) switchAttackInterval != 0)
+                    {
+                        // switchAttackTimerProgress = 0f;
+                        isSwitchAttack = false;
+                    }
                 }
+                /**/
 
                 // 生きているキノコの人数を算出
                 try
@@ -321,13 +358,13 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
                 if (aliveKinokoCount <= 0)
                 {
                     // タケノコの勝利
-                    Debug.Log("TAKENOKO WIN !!");
-                    ChangeState(GameStageState.FINISH);
+                    // Debug.Log("TAKENOKO WIN !!");
+                    // ChangeState(GameStageState.FINISH);
                 }else if (aliveTakenokoCount <= 0)
                 {
                     // キノコの勝利
-                    Debug.Log("KINOKO WIN !!");
-                    ChangeState(GameStageState.FINISH);
+                    // Debug.Log("KINOKO WIN !!");
+                    // ChangeState(GameStageState.FINISH);
                 }
                 
                 break;
