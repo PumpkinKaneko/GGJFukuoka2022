@@ -26,4 +26,10 @@ public class IngameUIGroup : UIBehaviour<IngameUIGroup>
     {
         timer.PlayTimer(time);
     }
+
+
+    public void TimerUpdate(float time, float limit)
+    {
+        timer.TimerUpdate(time, limit);
+    }
 }

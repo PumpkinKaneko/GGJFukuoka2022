@@ -31,7 +31,7 @@ public class TimerUI : MonoBehaviour
         if (isPlaying)
         {
             time -= Time.deltaTime;
-            UpdateFill();   // UIを更新
+            //UpdateFill();   // UIを更新
         }
     }
 
@@ -64,5 +64,14 @@ public class TimerUI : MonoBehaviour
     {
         maxTime = time;
         isPlaying = true;
+    }
+
+
+    public void TimerUpdate(float time, float limit)
+    {
+        this.time = time;
+        this.maxTime = limit;
+
+        UpdateFill();
     }
 }
