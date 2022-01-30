@@ -49,15 +49,19 @@ public class LoginManager : MonoBehaviourPunCallbacks
         string team = "";
         Player[] players = PhotonNetwork.PlayerList;
         if(players.Length % 2 == 0) { team = "Kinoko"; }
-        else {team = "Takenoko";}
+        else { team = "Takenoko"; }
 
         float rangeX = Random.Range(-10.0f, 10.0f);
         float rangeZ = Random.Range(-10.0f, 10.0f);
 
+        /*
         GameObject player = PhotonNetwork.Instantiate(
             "Networking/" + team, 
             new Vector3(rangeX, 1f, rangeZ),
             Quaternion.identity);
+        */
+        
+        PhotonNetwork.NickName = team;
         // ----------- Create Player Object END ---------------------
     
 

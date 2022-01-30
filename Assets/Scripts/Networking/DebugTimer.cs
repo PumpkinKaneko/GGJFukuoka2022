@@ -24,7 +24,7 @@ public class DebugTimer : MonoBehaviour
             this.remainingTime = this.PLAY_TIME
                 - (int)((PhotonNetwork.ServerTimestamp - startTime_f) * 0.001f); // 0.001f means millisec
 
-            UIManager.TimerUpdate(remainingTime, this.PLAY_TIME);
+            //UIManager.TimerUpdate(remainingTime, this.PLAY_TIME);
         }
 
         //Debug.Log(this.GetCurrentTimeRate());
