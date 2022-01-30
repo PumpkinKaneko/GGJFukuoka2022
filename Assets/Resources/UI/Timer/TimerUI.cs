@@ -28,11 +28,17 @@ public class TimerUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //UIManager.TimerUpdate(time, 30);
+
+        /*
         if (isPlaying)
         {
             time -= Time.deltaTime;
-            UpdateFill();   // UIを更新
+            //UpdateFill();   // UIを更新
+
+            Debug.Log("a");
         }
+        */
     }
 
 
@@ -41,7 +47,7 @@ public class TimerUI : MonoBehaviour
     /// </summary>
     private void Initialize()
     {
-        time = 0;
+        time = 30;
         maxTime = 0;
         isPlaying = false;
     }
@@ -64,5 +70,15 @@ public class TimerUI : MonoBehaviour
     {
         maxTime = time;
         isPlaying = true;
+    }
+
+
+    public void TimerUpdate(float time, float limit)
+    {
+        this.time = time;
+        this.maxTime = limit;
+        this.isPlaying = true;
+
+        UpdateFill();
     }
 }
