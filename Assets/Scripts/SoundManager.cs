@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Video;
 
 public class SoundManager : MonoBehaviour
 {
@@ -27,7 +28,6 @@ public class SoundManager : MonoBehaviour
     {
         instance = this;
         DontDestroyOnLoad(this.gameObject);
-
         audio = this.GetComponent<AudioSource>();
     }
 

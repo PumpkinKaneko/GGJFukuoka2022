@@ -431,6 +431,8 @@ MonoBehaviour:
   burningObject: {fileID: 7154494503472813433}
   playerCamera: {fileID: 7154494503490049714}
   lightObject: {fileID: 7154494504043797498}
+  lightCollider: {fileID: 7154494504043797494}
+  light: {fileID: 7154494504043797493}
   isAttack: 0
   hp: 10
   isLocal: 0
@@ -457,7 +459,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 7154494503490049714}
-  isStop: 0
+  isStop: 1
   moveSpeed: 50
   moveDecelerateFactor: 0.7
   xRotateSens: 5

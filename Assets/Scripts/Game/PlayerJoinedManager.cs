@@ -33,7 +33,7 @@ public class PlayerJoinedManager : MonoBehaviourPunCallbacks
     public override void OnJoinedRoom()
     {
         GameObject player = 
-            PhotonNetwork.Instantiate("Networking/"+prefabName,new Vector3(0,0,0),Quaternion.identity);
+            PhotonNetwork.Instantiate("Networking/"+prefabName,new Vector3(Random.Range(-10f,10f),0,Random.Range(-10f,10f)),Quaternion.identity);
         
         // for Timer 
         if (PhotonNetwork.IsMasterClient) {

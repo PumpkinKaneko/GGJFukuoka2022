@@ -72,8 +72,12 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
     private float elapsedTime = 0f;
 
     // ゲームが開始しているか
-    public bool isGamePlaying = false;
+    public bool isGamePlaying = true;
 
+    private bool isFinished = false;
+    
+    private string winTeam = "kinoko";
+    
     private bool isSwitchAttack = false;
 
     private float switchProgress = 0f;
@@ -85,7 +89,7 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         switchAttackTimerProgress = 0f;
         serverStartTime = PhotonNetwork.ServerTimestamp;
         thirdPersonCamera.gameObject.SetActive(false);
-        isGamePlaying = false;
+        isGamePlaying = true;
         isSwitchAttack = false;
         
         ChangeState(GameStageState.READY);
@@ -97,6 +101,7 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
     public void GameStart()
     {
         isGamePlaying = true;
+        ChangeState(GameStageState.START);
     }
 
     void Start()
@@ -113,20 +118,15 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         foreach (var chara in characterInfos)
         {
             // if (String.Equals(chara.Value.userId, localCharacter.userId)) t += "IsLocal:";
-            // t += chara.Value.userId + ":" + chara.Value.hp + ":" + chara.Value.isDead + "\r\n";
+            // t += chara.Value.userId + ":" + chara.Value.hp + ":" + chara.Value.isBurning + "\r\n";
         }
 
-        t += curState.ToString();
+        // t += curState.ToString();
         debugText.text = t;
 
         // 自分がクライアントの場合
         if (PhotonNetwork.IsMasterClient)
         {
-            if (Input.GetKeyDown(KeyCode.L))
-            {
-                ChangeState(GameStageState.START);
-            }
-            
             UpdateState();
             UpdateHashtable();
         }
@@ -165,10 +165,18 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
             localCharacter = character;
         }
 
-        Debug.Log(character.userId);
-        networkCharacters.Add(character.userId, character);
+        // Debug.Log(character.userId);
+        if (character.userId != null) networkCharacters.Add(character.userId, character);
     }
 
+    public void RemoveCharacter(PlayableCharacter character)
+    {
+        try
+        {
+            networkCharacters.Remove(character.userId);
+        }catch {}
+    }
+    
     public override void OnJoinedRoom()
     {
         // characterInfos = new Dictionary<string, CharacterCustomInfo>();
@@ -183,9 +191,10 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         }
         catch
         {
-            characterInfos.Add(targetPlayer.UserId,new CharacterCustomInfo());
+            if (targetPlayer.UserId != null)
+                characterInfos.Add(targetPlayer.UserId,new CharacterCustomInfo());
         }
-
+        
         try
         {
             characterInfos[targetPlayer.UserId] = CharacterCustomInfo.HashTableToCharacterInfo(changedProps);
@@ -194,7 +203,7 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         catch
         { }
    
-        if (networkCharacters.ContainsKey(targetPlayer.UserId))
+        if (targetPlayer.UserId != null && networkCharacters.ContainsKey(targetPlayer.UserId))
         {
             networkCharacters[targetPlayer.UserId].SetcustomInfo(characterInfos[targetPlayer.UserId]);
         }
@@ -211,11 +220,22 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         roomHash["stageSize"] = stageSize;
         roomHash["stageState"] = curState.ToString();
         roomHash["switchAttackTimerProgress"] = switchAttackTimerProgress;
+        roomHash["isFinished"] = isFinished;
+        roomHash["winTeam"] = winTeam;
         Room room = PhotonNetwork.CurrentRoom;
         room.SetCustomProperties(roomHash);
-
     }
-    
+
+    public override void OnPlayerLeftRoom(Player otherPlayer)
+    {
+        try
+        {
+            characterInfos.Remove(otherPlayer.UserId);
+        }
+        catch
+        {}
+    }
+
     public override void OnRoomPropertiesUpdate(Hashtable propertiesThatChanged)
     {
         if (PhotonNetwork.IsMasterClient || !PhotonNetwork.IsConnected) return;
@@ -225,6 +245,10 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         stageSize = (float) propertiesThatChanged["stageSize"];
         isGamePlaying = (bool) propertiesThatChanged["isGamePlaying"];
         stageSize = (float) propertiesThatChanged["stageSize"];
+        isFinished = (bool) propertiesThatChanged["isFinished"];
+        winTeam = (string) propertiesThatChanged["winTeam"];
+        CommonValues.Instance.winnerTeam = String.Equals(winTeam, "kinoko") ? TeamState.Kinoko : TeamState.Takenoko;
+        // Debug.Log(winTeam);
         ChangeState((string) propertiesThatChanged["stageState"]);
     }
 
@@ -238,6 +262,12 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         {
             case GameStageState.READY:
                 Init();
+                
+                // 初期化処理
+                foreach (var key in networkCharacters.Keys)
+                {
+                    if (!networkCharacters[key]) networkCharacters[key].Init();
+                }
                 break;
             case GameStageState.START:
                 TeamState attackTeam 
@@ -252,8 +282,21 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
             case GameStageState.GAME:
                 break;
             case GameStageState.FINISH:
+                /*
+                switch (winTeam)
+                {
+                    case "kinoko":
+                        CommonValues.Instance.winnerTeam = TeamState.Kinoko;
+                        break;
+                    case "takenoko":
+                        CommonValues.Instance.winnerTeam = TeamState.Takenoko;
+                        break;
+                }
+                /**/
+                ChangeState(GameStageState.END);
                 break;
             case GameStageState.END:
+                isGamePlaying = false;
                 break;
         }        
     }
@@ -310,27 +353,6 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
                     networkCharacters[key].UpdateTimer(switchAttackTimerProgress);
                 }
                 
-                /*
-                if ((int) elapsedTime % (int) switchAttackInterval == 0 && !isSwitchAttack)
-                {
-                    foreach (var key in networkCharacters.Keys)
-                    {
-                        bool isAttack = networkCharacters[key].isAttack;
-                        networkCharacters[key].SwitchAttack(!isAttack);
-                    }
-                    // switchAttackTimerProgress = 1f;
-                    isSwitchAttack = true;
-                }
-                else
-                {
-                    if ((int) elapsedTime % (int) switchAttackInterval != 0)
-                    {
-                        // switchAttackTimerProgress = 0f;
-                        isSwitchAttack = false;
-                    }
-                }
-                /**/
-
                 // 生きているキノコの人数を算出
                 try
                 {
@@ -354,19 +376,28 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
                 {
                     aliveTakenokoCount = networkCharacters.Values.Count;
                 }
-
+                
                 if (aliveKinokoCount <= 0)
                 {
                     // タケノコの勝利
-                    // Debug.Log("TAKENOKO WIN !!");
-                    // ChangeState(GameStageState.FINISH);
+                    Debug.Log("TAKENOKO WIN !!");
+                    winTeam = "takenoko";
+                    UpdateHashtable();
+                    ChangeState(GameStageState.FINISH);
+                    SetWinnerTeam(TeamState.Takenoko);
+                    localCharacter.PlayResultBGM(TeamState.Takenoko);
+                    // CommonValues.Instance.winnerTeam = TeamState.Takenoko;
                 }else if (aliveTakenokoCount <= 0)
                 {
                     // キノコの勝利
-                    // Debug.Log("KINOKO WIN !!");
-                    // ChangeState(GameStageState.FINISH);
+                    Debug.Log("KINOKO WIN !!");
+                    winTeam = "kinoko";
+                    UpdateHashtable();
+                    ChangeState(GameStageState.FINISH);
+                    SetWinnerTeam(TeamState.Kinoko);
+                    // CommonValues.Instance.winnerTeam = TeamState.Kinoko;                    
+                    localCharacter.PlayResultBGM(TeamState.Kinoko);
                 }
-                
                 break;
             case GameStageState.FINISH:
                 break;
@@ -375,7 +406,12 @@ public class GameStageManager : MonoBehaviourPunCallbacks, IPunInstantiateMagicC
         }
     }
 
-
+    public void SetWinnerTeam(TeamState team)
+    {
+        CommonValues.Instance.winnerTeam = team;
+    }
+    
+    
     public void OnPhotonInstantiate(PhotonMessageInfo info)
     {
         if (info.Sender.IsLocal)

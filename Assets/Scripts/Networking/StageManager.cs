@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using UnityEngine.SceneManagement;
 
 public class StageManager : MonoBehaviourPunCallbacks
 {
@@ -15,10 +16,19 @@ public class StageManager : MonoBehaviourPunCallbacks
         GAME,
         END
     }
+
+    [SerializeField]
+    private string kinokoPrefabName;
+
+    [SerializeField]
+    private string takenokoPrefabname;
+
+    [SerializeField]
+    private int maxPlayer = 4;
     
     public STAGE_STATE state = STAGE_STATE.INIT;
 
-    private int WAIT_TIME = 3;
+    private int WAIT_TIME = 10;
 
     private bool isGamePlaying = false;
 
@@ -39,7 +49,9 @@ public class StageManager : MonoBehaviourPunCallbacks
             case STAGE_STATE.INIT:
                 this.isGamePlaying = false;
                 this.movieTimer = 0;
-
+                
+                SoundManager.Instance.PlayBGM(AudioState.BGM_2);
+                
                 GameObject tc = GameObject.Find("TitleCanvas");
                 tc.GetComponent<Canvas>().enabled = true;
                 GameObject wc = GameObject.Find("WaitCanvas");
@@ -68,7 +80,11 @@ public class StageManager : MonoBehaviourPunCallbacks
                 break;
 
             case STAGE_STATE.WAIT:
-                this.waitForOthers();
+                if (PhotonNetwork.PlayerList.Length >= maxPlayer)
+                {
+                    this.state = STAGE_STATE.TEAM_MOVIE;
+                }
+                // this.waitForOthers();
                 break;
 
             case STAGE_STATE.TEAM_MOVIE:
@@ -83,15 +99,23 @@ public class StageManager : MonoBehaviourPunCallbacks
                 if (this.movieTimer >= 15) {
                     mc = GameObject.Find("MovieCanvas");
                     mc.GetComponent<Canvas>().enabled = false;
-
+                    
+                    // ゲーム開始
+                    GameStageManager.Instance.GameStart();
                     this.state = STAGE_STATE.GAME;
                 }
                 break;
             
             case STAGE_STATE.GAME:
+                if (!GameStageManager.Instance.isGamePlaying)
+                {
+                    PhotonNetwork.Disconnect();
+                    this.state = STAGE_STATE.END;
+                }
                 break;
             
             case STAGE_STATE.END:
+                SceneManager.LoadScene("Result");
                 this.isGamePlaying = false;
                 break;
         }
@@ -121,7 +145,7 @@ public class StageManager : MonoBehaviourPunCallbacks
     }
 
     void showMovie () {
-        if (PhotonNetwork.NickName == "Kinoko" ) { UIManager.PlayTeamMovie(TeamState.Kinoko); }
+        if (PhotonNetwork.NickName == kinokoPrefabName ) { UIManager.PlayTeamMovie(TeamState.Kinoko); }
         else { UIManager.PlayTeamMovie(TeamState.Takenoko); }
     }
 
@@ -136,16 +160,24 @@ public class StageManager : MonoBehaviourPunCallbacks
     public override void OnConnectedToMaster()
     {
         //base.OnConnectedToMaster();
-        PhotonNetwork.JoinOrCreateRoom("GGJFukuoka2022", new RoomOptions(), TypedLobby.Default);
+        RoomOptions options = new RoomOptions();
+        options.PublishUserId = true;
+        PhotonNetwork.JoinOrCreateRoom("GGJFukuoka2022", options, TypedLobby.Default);
     }
 
     public override void OnJoinedRoom()
     {
+        if (PhotonNetwork.PlayerList.Length > maxPlayer)
+        {
+            this.state = STAGE_STATE.LOGIN;
+            return;
+        }
+        
         // ----------- Create Player Object BEGIN ---------------------
         string team = "";
         Player[] players = PhotonNetwork.PlayerList;
-        if(players.Length % 2 == 0) { team = "Kinoko"; }
-        else { team = "Takenoko"; }
+        if(players.Length % 2 == 0) { team = kinokoPrefabName; }
+        else { team = takenokoPrefabname; }
 
         float rangeX = Random.Range(-10.0f, 10.0f);
         float rangeZ = Random.Range(-10.0f, 10.0f);

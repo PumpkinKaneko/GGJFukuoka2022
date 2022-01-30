@@ -17,6 +17,12 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
 
     [SerializeField]
     private GameObject lightObject;
+
+    [SerializeField]
+    private BoxCollider lightCollider;
+
+    [SerializeField]
+    private Light light;
     
     public bool isAttack = false;
     
@@ -27,10 +33,16 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
     public bool isDead = false;
 
     public string userId;
-    
+
+    private bool isBurning = false;
+
     public bool IsBurning
     {
-        get => burningObject.isBurning;
+        get
+        {
+            // if (!isLocal) return isBurning;
+            return burningObject.isBurning;
+        }
     }
 
     // 焼かれてしまった
@@ -63,6 +75,8 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
 
     private bool isInit = false;
 
+    private bool isPlayMeltSE = false;
+    
     // 初期化処理
     public void Init()
     {
@@ -86,6 +100,7 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
 
     public void GameStart()
     {
+        Debug.Log("Game Start !!!");
         photonView.RPC(nameof(GameStartRPC),RpcTarget.All);
     }
 
@@ -94,13 +109,18 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
     {
         if (photonView.IsMine)
         {
+            playerCanvas.gameObject.SetActive(true);
+            characterController.isStop = false;
+            playerCamera.enabled = true;
             playerCamera.gameObject.SetActive(true);
         }
     }
     
     void Start()
     {
-
+        characterController = GetComponent<CharacterController>();
+        characterController.isStop = true;
+        PlayBGM(AudioState.BGM_5);
     }
 
     void Update()
@@ -116,18 +136,22 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
                 {
                     playerCanvas.SetActive(true);
                     isLocal = true;
-                    playerCamera.enabled = true;            
+                    playerCamera.enabled = false;       
+                    playerCanvas.gameObject.SetActive(false);
+                    // playerCamera.gameObject.SetActive(false);
                     GameStageManager.Instance.SetCharacter(this,true);
-                    // characterController.isStop = false;
+                    characterController.isStop = true;
                 }
                 else
                 {
                     playerCanvas.SetActive(false);
                     isLocal = false;
+                    playerCanvas.gameObject.SetActive(false);
                     playerCamera.enabled = false;
+                    // playerCamera.gameObject.SetActive(false);
                     GameStageManager.Instance.SetCharacter(this,false);
                     // コントローラーを無効化
-                    // characterController.isStop = true;
+                    characterController.isStop = true;
                 }
 
                 SwitchAttack(false);
@@ -157,12 +181,21 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
         enemyHPSlider.value = 1f - Mathf.InverseLerp(0f, burnedDeadTime,burnedTime);
         if (IsBurning && !isBurned)
         {
+            if (!isPlayMeltSE)
+            {
+                SoundManager.Instance.PlaySE(AudioState.MELTING);
+                isPlayMeltSE = true;
+            }
             if (burnedTime >= burnedDeadTime)
             {
                 isBurned = true;
                 OnBurned();
             }
             burnedTime += Time.deltaTime;
+        }
+        else
+        {
+            isPlayMeltSE = false;
         }
     }
 
@@ -216,6 +249,7 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
         isDead = info.isDead;
         hp = info.hp;
         isAttack = info.isAttack;
+        isBurning = info.isBurning;
     }
     
     public void OnConnectedToServer()
@@ -246,6 +280,11 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
 
     public void SwitchAttack(bool isAttack)
     {
+        if (isLocal)
+        {
+            AudioState state = isAttack ? AudioState.BGM_1 : AudioState.BGM_3;
+            PlayBGM(state);
+        }
         photonView.RPC(nameof(SwitchAttackRPC),RpcTarget.All,isAttack);
     }
     
@@ -253,8 +292,39 @@ public class PlayableCharacter : MonoBehaviourPunCallbacks
     public void SwitchAttackRPC(bool isAttack)
     {
         this.isAttack = isAttack;
-        lightObject.SetActive(this.isAttack);
+        if (isAttack)
+        {
+            light.intensity = 4f;
+            lightCollider.enabled = true;
+        }
+        else
+        {
+            light.intensity = 0f;
+            lightCollider.enabled = false;
+        }
+        // lightObject.SetActive(this.isAttack);
     }
 
+    
+    private void OnApplicationQuit()
+    {
+        GameStageManager.Instance.RemoveCharacter(this);
+        PhotonNetwork.Disconnect();
+    }
+
+    public void PlayResultBGM(TeamState state)
+    {
+        if (isLocal)
+        {
+            bool isWin = team == state;
+            if (isWin) SoundManager.Instance.PlayBGM(AudioState.BGM_5);
+            else SoundManager.Instance.PlayBGM(AudioState.BGM_2);
+        }
+    }
+    
+    public void PlayBGM(AudioState state)
+    {
+        SoundManager.Instance.PlayBGM(state);
+    }
     
 }
