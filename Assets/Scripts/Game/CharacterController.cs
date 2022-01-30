@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using Photon.Pun;
 using UnityEngine;
 
-public class CharacterController : MonoBehaviour
+public class CharacterController : MonoBehaviourPunCallbacks
 {
 
     [SerializeField]
@@ -10,6 +11,8 @@ public class CharacterController : MonoBehaviour
     
     private IInputProvider inputProvider;
 
+    public bool isStop = false;
+    
     public void InstallInputProvider(IInputProvider provider)
     {
         inputProvider = provider;
@@ -35,11 +38,16 @@ public class CharacterController : MonoBehaviour
     
     void Start()
     {
+        if (photonView.IsMine) isStop = false;
+        else isStop = true;
+        
         rBody = GetComponent<Rigidbody>();
     }
 
     void Update()
     {
+        if (isStop) return;
+        
         UpdateCursor();
 
         UpdateInput();
@@ -136,12 +144,11 @@ public class CharacterController : MonoBehaviour
         transform.Rotate(newRot,Space.World);
 
     }
-    
+
     // TODO : 全体を管理するクラスで実装
     private void UpdateCursor()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
-    
 }

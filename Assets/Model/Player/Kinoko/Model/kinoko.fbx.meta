@@ -4,6 +4,9 @@ ModelImporter:
   serializedVersion: 21202
   internalIDToNameTable:
   - first:
+      74: 5866576275671282845
+    second: Armature|death
+  - first:
       74: -1978303741906493279
     second: Armature|idle
   - first:

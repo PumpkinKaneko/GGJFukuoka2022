@@ -5,6 +5,8 @@ TagManager:
   serializedVersion: 2
   tags:
   - BurningLight
+  - BurningKinokoLight
+  - BurningTakenokoLight
   layers:
   - Default
   - TransparentFX
