@@ -11,14 +11,12 @@ public class LoginManager : MonoBehaviourPunCallbacks
 {
     void Start()
     {
-        PhotonNetwork.ConnectUsingSettings();
+        //PhotonNetwork.ConnectUsingSettings();
     }
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape) == true) {
-            Application.Quit();
-        }
+        
     }
 
     void OnGUI ()
@@ -54,13 +52,11 @@ public class LoginManager : MonoBehaviourPunCallbacks
         float rangeX = Random.Range(-10.0f, 10.0f);
         float rangeZ = Random.Range(-10.0f, 10.0f);
 
-        /*
         GameObject player = PhotonNetwork.Instantiate(
             "Networking/" + team, 
             new Vector3(rangeX, 1f, rangeZ),
             Quaternion.identity);
-        */
-        
+
         PhotonNetwork.NickName = team;
         // ----------- Create Player Object END ---------------------
     

@@ -14,7 +14,7 @@ public class MovieUIGroup : UIBehaviour<MovieUIGroup>
     // Start is called before the first frame update
     void Start()
     {
-        UIManager.PlayTeamMovie(TeamState.Takenoko);     // �w�肵��������Đ�����
+        //UIManager.PlayTeamMovie(TeamState.Takenoko);     // �w�肵��������Đ�����
     }
 
     // Update is called once per frame
