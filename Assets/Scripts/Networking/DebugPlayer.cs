@@ -7,6 +7,9 @@ using Photon.Realtime;
 
 public class DebugPlayer : MonoBehaviourPunCallbacks, IPunObservable
 {
+    //[SerializeField]
+    //private GameObject stageManager = default;
+
     [SerializeField]
     private Camera playerCamera = default;
 
@@ -24,11 +27,17 @@ public class DebugPlayer : MonoBehaviourPunCallbacks, IPunObservable
     void Start()
     {
         this.hp = this.MAX_HP;
+        this.playerCamera.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
+        StageManager.STAGE_STATE stageState = GameObject.Find("StageManager").GetComponent<StageManager>().getStageState();
+        if (stageState < StageManager.STAGE_STATE.GAME) {
+            return;
+        }
+
         if(photonView.IsMine == true) // my turn
         {
             this.playerCamera.gameObject.SetActive(true); // enable my camera
