@@ -49,12 +49,14 @@ public class SoundManager : MonoBehaviour
     public void PlayBGM(AudioState state)
     {
         audio.clip = clips[(int)state];
+        audio.loop = true;
         audio.Play();
     }
 
 
     public void PlaySE(AudioState state)
     {
+        audio.loop = false;
         audio.PlayOneShot(clips[(int)state]);
     }
 }
@@ -65,6 +67,8 @@ public enum AudioState
     BGM_1 = 0,
     BGM_2,
     BGM_3,
+    BGM_4,
+    BGM_5,
     DEFENCE,
     MELTING
 }
