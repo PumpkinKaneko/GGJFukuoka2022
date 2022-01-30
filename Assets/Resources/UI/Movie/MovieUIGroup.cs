@@ -7,14 +7,14 @@ using UnityEngine.Video;
 
 public class MovieUIGroup : UIBehaviour<MovieUIGroup>
 {
-    [SerializeField]private VideoClip[] movies;          // Ä¶‚·‚é“®‰æƒtƒ@ƒCƒ‹
-    [SerializeField]private VideoPlayer targetPlayer;    // ‘ÎÛ‚ÌVideoPlayerƒRƒ“ƒ|[ƒlƒ“ƒg
+    [SerializeField]private VideoClip[] movies;          // ï¿½Äï¿½ï¿½ï¿½ï¿½é“®ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½
+    [SerializeField]private VideoPlayer targetPlayer;    // ï¿½ÎÛ‚ï¿½VideoPlayerï¿½Rï¿½ï¿½ï¿½|ï¿½[ï¿½lï¿½ï¿½ï¿½g
 
 
     // Start is called before the first frame update
     void Start()
     {
-        //UIManager.PlayTeamMovie(TeamState.Kinoko);     // w’è‚µ‚½“®‰æ‚ğÄ¶‚·‚é
+        UIManager.PlayTeamMovie(TeamState.Takenoko);     // ï¿½wï¿½è‚µï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½ï¿½
     }
 
     // Update is called once per frame
@@ -25,25 +25,25 @@ public class MovieUIGroup : UIBehaviour<MovieUIGroup>
 
 
     /// <summary>
-    /// “®‰æÄ¶ƒƒ\ƒbƒh
+    /// ï¿½ï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½\ï¿½bï¿½h
     /// </summary>
-    /// <param name="team">ƒ`[ƒ€‚Ìó‘Ô</param>
+    /// <param name="team">ï¿½`ï¿½[ï¿½ï¿½ï¿½Ìï¿½ï¿½</param>
     public override void PlayMovie(TeamState team)
     {
         switch(team)
         {
             case TeamState.Kinoko:
-                targetPlayer.clip = movies[0];  // ƒLƒmƒR—p“®‰æ‚ğƒZƒbƒg
-                targetPlayer.Play();            // Ä¶
+                targetPlayer.clip = movies[0];  // ï¿½Lï¿½mï¿½Rï¿½pï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½bï¿½g
+                targetPlayer.Play();            // ï¿½Äï¿½
 
-                //Debug.Log("ƒLƒmƒR‚ğÄ¶‚µ‚Ü‚·B");
+                //Debug.Log("ï¿½Lï¿½mï¿½Rï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B");
                 break;
 
             case TeamState.Takenoko:
-                targetPlayer.clip = movies[1];  // ƒ^ƒPƒmƒR—p“®‰æ‚ğƒZƒbƒg
-                targetPlayer.Play();            // Ä¶
+                targetPlayer.clip = movies[1];  // ï¿½^ï¿½Pï¿½mï¿½Rï¿½pï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½bï¿½g
+                targetPlayer.Play();            // ï¿½Äï¿½
 
-                //Debug.Log("ƒ^ƒPƒmƒR‚ğÄ¶‚µ‚Ü‚·B");
+                //Debug.Log("ï¿½^ï¿½Pï¿½mï¿½Rï¿½ï¿½ï¿½Äï¿½ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½B");
                 break;
         }
 
@@ -53,7 +53,7 @@ public class MovieUIGroup : UIBehaviour<MovieUIGroup>
 
 
 /// <summary>
-/// ƒ`[ƒ€‚Ìó‘Ô‘JˆÚ”Ô†
+/// ï¿½`ï¿½[ï¿½ï¿½ï¿½Ìï¿½Ô‘Jï¿½Ú”Ôï¿½
 /// </summary>
 public enum TeamState
 {

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 using Photon.Pun;
 using Photon.Realtime;
 
@@ -34,23 +36,42 @@ public class LoginManager : MonoBehaviourPunCallbacks
     {
         //base.OnJoinedRoom();
 
+        //PhotonNetwork.IsMessageQueueRunning = false;
+        //SceneManager.LoadScene("");
+
+        
+        //if (PhotonNetwork.CurrentRoom.PlayerCount == PhotonNetwork.CurrentRoom.MaxPlayers) {
+        //    PhotonNetwork.CurrentRoom.IsOpen = false;
+        //}
+
+
         // ----------- Create Player Object BEGIN ---------------------
-        string team = "Kinoko";
+        string team = "";
+        Player[] players = PhotonNetwork.PlayerList;
+        if(players.Length % 2 == 0) { team = "Kinoko"; }
+        else { team = "Takenoko"; }
 
         float rangeX = Random.Range(-10.0f, 10.0f);
         float rangeZ = Random.Range(-10.0f, 10.0f);
 
+        /*
         GameObject player = PhotonNetwork.Instantiate(
             "Networking/" + team, 
             new Vector3(rangeX, 1f, rangeZ),
             Quaternion.identity);
+        */
+        
+        PhotonNetwork.NickName = team;
         // ----------- Create Player Object END ---------------------
     
+
         // for Timer 
         if (PhotonNetwork.IsMasterClient) {
             var properties = new ExitGames.Client.Photon.Hashtable();
             properties.Add ("StartTime", PhotonNetwork.ServerTimestamp);
             PhotonNetwork.CurrentRoom.SetCustomProperties (properties);
-        }
+        }  
     }
+
+    //OnCreateRoomFailed
 }
