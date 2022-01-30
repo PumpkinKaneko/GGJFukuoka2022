@@ -27,9 +27,15 @@ public class DebugTimer : MonoBehaviour
             UIManager.TimerUpdate(remainingTime, this.PLAY_TIME);
         }
 
+        //Debug.Log(this.GetCurrentTimeRate());
+
         if (this.remainingTime < 0) {
             this.remainingTime = 0;
         }
+    }
+
+    public float GetCurrentTimeRate(){
+        return (float)this.remainingTime / (float)this.PLAY_TIME;
     }
 
     void OnGUI ()

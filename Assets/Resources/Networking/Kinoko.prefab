@@ -288,11 +288,9 @@ MonoBehaviour:
   prefixField: -1
   Synchronization: 3
   OwnershipTransfer: 0
-  observableSearch: 2
+  observableSearch: 0
   ObservedComponents:
-  - {fileID: 1330454367330785816}
-  - {fileID: 8741989746650737917}
-  - {fileID: -1008596487444472124}
+  - {fileID: 0}
   sceneViewId: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -311,7 +309,7 @@ MonoBehaviour:
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
-  m_UseLocal: 1
+  m_UseLocal: 0
 --- !u!114 &8741989746650737917
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -656,6 +654,18 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 2134710809453235210}
     m_Modifications:
+    - target: {fileID: -5785896483158307289, guid: 33070829f95ff4991ad38c1e2c1d4176, type: 3}
+      propertyPath: observableSearch
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -5785896483158307289, guid: 33070829f95ff4991ad38c1e2c1d4176, type: 3}
+      propertyPath: ObservedComponents.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -1973518585966681296, guid: 33070829f95ff4991ad38c1e2c1d4176, type: 3}
+      propertyPath: m_UseLocal
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5145401615453918080, guid: 33070829f95ff4991ad38c1e2c1d4176, type: 3}
       propertyPath: m_Name
       value: PlayerCamera
