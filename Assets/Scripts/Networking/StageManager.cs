@@ -24,7 +24,7 @@ public class StageManager : MonoBehaviourPunCallbacks
     private string takenokoPrefabname;
 
     [SerializeField]
-    private int maxPlayer = 4;
+    private int maxPlayer = 2;
     
     public STAGE_STATE state = STAGE_STATE.INIT;
 
